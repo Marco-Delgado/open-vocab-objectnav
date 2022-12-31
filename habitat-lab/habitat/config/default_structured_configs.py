@@ -185,6 +185,11 @@ class ObjectGoalSensorConfig(LabSensorConfig):
 
 
 @dataclass
+class ObjectGoalPromptSensorConfig(LabSensorConfig):
+    type: str = "ObjectGoalPromptSensor"
+
+
+@dataclass
 class ImageGoalSensorConfig(LabSensorConfig):
     type: str = "ImageGoalSensor"
 
@@ -1232,7 +1237,6 @@ cs.store(
     node=HabitatSimEquirectangularSemanticSensorConfig,
 )
 
-
 cs.store(
     group="habitat/simulator/sim_sensors",
     name="arm_depth_sensor",
@@ -1269,7 +1273,6 @@ cs.store(
     node=ThirdRGBSensorConfig,
 )
 
-
 # Task Sensors
 cs.store(
     package="habitat.task.lab_sensors.gps_sensor",
@@ -1294,6 +1297,12 @@ cs.store(
     group="habitat/task/lab_sensors",
     name="objectgoal_sensor",
     node=ObjectGoalSensorConfig,
+)
+cs.store(
+    package="habitat.task.lab_sensors.objectgoalprompt_sensor",
+    group="habitat/task/lab_sensors",
+    name="objectgoalprompt_sensor",
+    node=ObjectGoalPromptSensorConfig,
 )
 cs.store(
     package="habitat.task.lab_sensors.imagegoal_sensor",
@@ -1409,7 +1418,6 @@ cs.store(
     name="nav_goal_sensor",
     node=NavGoalPointGoalSensorConfig,
 )
-
 
 # Task Measurements
 cs.store(
@@ -1658,7 +1666,6 @@ cs.store(
     name="rearrange_reach_success",
     node=RearrangeReachSuccessMeasurementConfig,
 )
-
 
 from hydra.core.config_search_path import ConfigSearchPath
 from hydra.core.plugins import Plugins

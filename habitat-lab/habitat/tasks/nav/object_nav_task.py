@@ -3,6 +3,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
+import pickle
 from typing import TYPE_CHECKING, Any, List, Optional
 
 import attr
@@ -165,6 +166,7 @@ class ObjectGoalSensor(Sensor):
             return None
         category_name = episode.object_category
         if self.config.goal_spec == "TASK_CATEGORY_ID":
+            print("..")
             return np.array(
                 [self._dataset.category_to_task_category_id[category_name]],
                 dtype=np.int64,
@@ -177,6 +179,40 @@ class ObjectGoalSensor(Sensor):
             raise RuntimeError(
                 "Wrong goal_spec specified for ObjectGoalSensor."
             )
+
+
+@registry.register_sensor
+class ObjectGoalPromptSensor(Sensor):
+    cls_uuid: str = "clip_embedding"
+
+    def __init__(self, sim, config, **kwargs):
+        super().__init__(config=config)
+        self._sim = sim
+
+        with open("embeddings.pickle", "rb") as f:
+            self.object_embeddings = pickle.load(f)
+
+    # Defines the name of the sensor in the sensor suite dictionary
+    def _get_uuid(self, *args, **kwargs):
+        return self.cls_uuid
+
+    # Defines the type of the sensor
+    def _get_sensor_type(self, *args, **kwargs):
+        return SensorTypes.SEMANTIC
+
+    # Defines the size and range of the observations of the sensor
+    def _get_observation_space(self, *args, **kwargs):
+        return spaces.Box(
+            low=np.finfo(np.float32).min,
+            high=np.finfo(np.float32).max,
+            shape=(512, ),
+            dtype=np.float32,
+        )
+
+    # This is called whenever reset is called or an action is taken
+    def get_observation(self, observations, *args, episode, **kwargs):
+        object_goal = episode.object_category
+        return self.object_embeddings[object_goal]
 
 
 @registry.register_task(name="ObjectNav-v1")
